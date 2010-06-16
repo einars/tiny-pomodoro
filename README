@@ -1,0 +1,10 @@
+Einar Lielmanis, einar@spicausis.lv
+
+Tiny timer for my variations on pomodoro time tracking technique [1].
+Didn't like all of the existing implementations, overengineered and
+terrible. focus-booster [2] was almost fine (even if buggy-ish), but
+this simple timer beats it for me.
+
+
+1: www.pomodorotechnique.com
+2: www.focusboosterapp.com

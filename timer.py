@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+from sys import stdout
+
+import pygtk
+import os
+
+pygtk.require('2.0')
+
+import gtk
+import pango
+
+import gobject
+
+from subprocess import Popen
+
+class PomodoroTimer:
+
+    def draw_timer(self):
+        self.timer_label.set_text("%02d:%02d" % (self.timer / 60, self.timer % 60))
+
+    def schedule_tick(self):
+        gobject.timeout_add(1000, self.update_timer)
+
+    def update_timer(self):
+        if self.timer_state == "running":
+            self.timer -= 1
+            self.draw_timer()
+            if self.timer == 0:
+
+                Popen(['aplay', '-q', 'timeout.wav'])
+
+                self.start_stop_button.set_label("Start")
+                self.timer = self.initial_timer
+                self.timer_state = "stop"
+                self.draw_timer()
+            else:
+                self.schedule_tick()
+
+
+    def __init__(self, initial_timer = 30 * 60):
+
+        self.timer = initial_timer
+        self.initial_timer = initial_timer
+        self.timer_state = "stop"
+
+        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+
+        self.window.set_title("Pomodoro timer")
+        self.window.set_property("skip-taskbar-hint", True)
+        self.window.set_property("resizable", False)
+        self.window.set_keep_above(True)
+
+        self.window.connect("destroy", self.on_destroy)
+        self.window.set_border_width(10)
+
+        self.vbox = gtk.VBox(False, 0)
+        self.window.add(self.vbox)
+
+
+        self.start_stop_button = gtk.Button("Start")
+        self.start_stop_button.connect("clicked", self.on_start_stop_clicked, None)
+
+        self.timer_label = gtk.Label("XX:XX")
+        self.timer_label.modify_font(pango.FontDescription("Bitstream Vera Sans 18"))
+        self.timer_label.set_alignment(0, 0)
+
+        self.vbox.pack_start(self.timer_label, True, True, 0)
+        self.vbox.pack_start(self.start_stop_button, True, True, 0)
+
+        self.draw_timer()
+
+        self.start_stop_button.show()
+        self.timer_label.show()
+        self.vbox.show()
+        self.window.show()
+
+    def on_start_stop_clicked(self, widget, data=None):
+        if self.timer_state == "stop":
+            self.start_stop_button.set_label("Stop")
+            self.timer_state = "running"
+            self.timer = self.initial_timer
+            self.update_timer()
+        elif self.timer_state == "running":
+            self.start_stop_button.set_label("Reset")
+            self.timer_state = "paused"
+        elif self.timer_state == "paused":
+            self.start_stop_button.set_label("Start")
+            self.timer_state = "stop"
+            self.timer = self.initial_timer
+            self.draw_timer()
+
+
+    def on_destroy(self, widget, data=None):
+        gtk.main_quit()
+
+    def main(self):
+        gtk.main()
+
+
+if __name__ == "__main__":
+    os.chdir(os.path.dirname(sys.argv[0]))
+    try:
+        pt = PomodoroTimer(int(sys.argv[1]))
+    except:
+        pt = PomodoroTimer()
+    pt.main()
+
+
+
