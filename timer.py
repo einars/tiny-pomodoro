@@ -115,7 +115,7 @@ if __name__ == "__main__":
             interval_s = 3
         else:
             try:
-                interval_s = 60 * int(sys.argv[1])
+                interval_s = 60 * float(sys.argv[1])
             except:
                 pass
     pt = PomodoroTimer(interval_s)
