@@ -101,7 +101,13 @@ class PomodoroTimer:
 
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.readlink(sys.argv[0])))
+    dirname = os.path.dirname(sys.argv[0])
+    try:
+        dirname = os.path.dirname(os.readlink(sys.argv[0]))
+    except OSError:
+        pass
+    os.chdir(dirname)
+
     interval_s = 30 * 60
     if len(sys.argv) > 1:
         print('lola')
