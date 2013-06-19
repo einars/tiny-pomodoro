@@ -134,7 +134,6 @@ if __name__ == "__main__":
 
     interval_s = 30 * 60
     if len(sys.argv) > 1:
-        print('lola')
         if sys.argv[1] == 'test':
             interval_s = 3
         else:
